@@ -19,7 +19,7 @@ class UserService{
         return result
     }
     async list(value){
-        const _sql = `SELECT id, folder_name,algo_type FROM algo WHERE create_by = ?;`
+        const _sql = `SELECT id,algo_type FROM algo WHERE create_by = ?;`
         const [result] = await db.execute(_sql,value)
         return result
     }

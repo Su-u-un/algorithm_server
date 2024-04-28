@@ -83,20 +83,24 @@ class UserController{
             let arr = []
             let files = fs.readdirSync(absolute);
             let id = 0
-            files.forEach((file) => {
-                let folders = fs.readdirSync(`${absolute}/${file}`)
-                folders.forEach((folder) => {
-                    let obj = {}
-                    obj.id = id++
-                    obj.folder_name = folder
-                    obj.algo_type = file
-                    arr.push(obj)
-                })
+            arr = files.map((file) => {
+                return {
+                    id: id++,
+                    algo_type: file
+                }
+                // let folders = fs.readdirSync(`${absolute}/${file}`)
+                // folders.forEach((folder) => {
+                //     let obj = {}
+                //     obj.id = id++
+                //     obj.folder_name = folder
+                //     obj.algo_type = file
+                //     arr.push(obj)
+                // })
             })
             // 请求头返回token
             // ctx.append('Authorization',token)
             ctx.body = {
-                code:0,
+                code:'0',
                 msg:"success",
                 list:temp,
                 public:arr,
@@ -115,13 +119,33 @@ class UserController{
                     _id: result[0]._id,
                     username: result[0].username
                 }, "0.5d")
+                // 获取用户文件
                 const temp = await userService.list([data.username])
+                // 获取系统文件
+                let arr = []
+                let files = fs.readdirSync(absolute);
+                let id = 0
+                arr = files.map((file) => {
+                    return {
+                        id: id++,
+                        algo_type: file
+                    }
+                    // let folders = fs.readdirSync(`${absolute}/${file}`)
+                    // folders.forEach((folder) => {
+                    //     let obj = {}
+                    //     obj.id = id++
+                    //     obj.folder_name = folder
+                    //     obj.algo_type = file
+                    //     arr.push(obj)
+                    // })
+                })
                 // 请求头返回token
                 // ctx.append('Authorization',token)
                 ctx.body = {
-                    code:0,
+                    code:'0',
                     msg:"success",
                     list:temp,
+                    public:arr,
                     token:token,
                     username:data.username
                 }

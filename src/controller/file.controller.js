@@ -4,9 +4,11 @@ const fs = require('fs')
 const {resolve} = require('path')
 
 const fileURL = resolve(__dirname,'../files')
+// 用户文件区绝对路径
+const absolute = resolve(__dirname,'../files/public')
 
 class fileController {
-    // 保存file
+    // 保存file(新增或更新)
     async save(ctx){
         const {filename,folderid,content,realurl} = ctx.request.body
         const type = filename.split('.')[filename.split('.').length-1]
@@ -22,7 +24,7 @@ class fileController {
             }
             // 定义一个独一无二的url，用它作真实路径
             const tempurl = `${new Date().getTime()}.txt`
-            await fileService.save([filename,folderid,tempurl,type])
+            await fileService.add([filename,folderid,tempurl,type])
             fs.writeFileSync(resolve(fileURL,tempurl), content);
             ctx.body = {
                 code:'0',
@@ -54,11 +56,16 @@ class fileController {
     }
     // 读取file
     async readfile(ctx){
-        const {foldername,algotype,username} = ctx.request.query
-        // 根据点击的算法找到算法id，用算法id去遍历他的文件
-        const id = await fileService.readFoleder([foldername,algotype,username])
+        const {id} = ctx.request.query
         // 得到所有文件的url
-        const res = await fileService.readFile([id[0].id])
+        const res = await fileService.readFile([id])
+        // 为空说明是新建的文件夹，没有file，这边直接新建一个，并且写进数据库
+        if(!res.length){
+            // 定义一个独一无二的url，用它作真实路径
+            const tempurl = `${new Date().getTime()}.txt`
+            await fileService.add(['readme.md',id,tempurl,'md'])
+            fs.writeFileSync(resolve(fileURL,tempurl), '');
+        }
         const files = []
         for(let i=0;i<res.length;i++){
             const temp = fs.readFileSync(resolve(fileURL,res[i].real_url)).toString()
@@ -67,8 +74,39 @@ class fileController {
         ctx.body = {
             code:'0',
             msg:'ok',
-            id:id[0].id,
             data:files
+        }
+    }
+
+    // 保存folder
+    async saveFolder(ctx){
+        const {id,algoid,foldername} = ctx.request.body
+        // 两种情况，一种是保存，一种是更新
+        // 通过判断id是否存在，因为前端会用最大id+1作为id
+        const exist = await fileService.existFolder([id])
+        if(exist.length){
+            const res = await fileService.updateFolder([foldername,id])
+            ctx.body = {
+                code:'0',
+                msg:'更新成功'
+            }
+        }
+        else{
+            const res = await fileService.addFolder([foldername,id,algoid])
+            ctx.body = {
+                code:'0',
+                msg:'保存成功'
+            }
+        }        
+    }
+    // 读取folder
+    async readFolder(ctx){
+        const {id} = ctx.request.query
+        const res = await fileService.readFolder([id])
+        ctx.body = {
+            code:'0',
+            msg:'success',
+            data:res
         }
     }
     // build代码
@@ -105,20 +143,70 @@ class fileController {
         ctx.body = {
             code:'0',
             msg:'ok',
-            id:999,
             data:files
         }
     }
-    // 保存folder
-    async saveAlgo(ctx){
-        const {foldername,algotype,username} = ctx.request.body
-        const res = await fileService.add([foldername,algotype,username])
-        // 判断是否存在这个，也不对，前端如果修改名，要把旧名字和新名字一起传回来。所以判断
-        // 有没有传旧名字，这样就知道是改名还是新建。然后使用对应的serve
-        ctx.body = {
+    // 读取公共文件folder
+    async readFolderPublic(ctx){
+        const {foldername} = ctx.request.query 
+        let folders = fs.readdirSync(`${absolute}/${foldername}`)
+        let arr = []
+        folders.forEach((folder) => {
+            let obj = {}
+            obj.folder_name = folder
+            arr.push(obj)
+        })
+        ctx.body={
             code:'0',
             msg:'ok',
-            data:res
+            data:arr
+        }
+    }
+    // 保存Algo(新增或更新)
+    async saveAlgo(ctx){
+        const {id,algotype,username} = ctx.request.body
+        // 如果不存在id，说明是新增
+        if(!id){
+            if(!algotype){
+                ctx.body = {
+                    code:'-1',
+                    msg:'错误，请联系管理员'
+                }
+                return
+            }
+            const res = await fileService.addAlgo([algotype,username])
+            ctx.body = {
+                code:'0',
+                msg:'保存成功',
+                data:res
+            }
+        }
+        // 否则是更新
+        else{
+            await fileService.updateAlgo([algotype,id])
+            ctx.body = {
+                code:'0',
+                msg:'更新成功'
+            }
+        }
+        
+    }
+    // 获取用户文件和公共文件
+    async list(ctx){
+        const data = ctx.request.query
+        // 获取用户文件
+        const file = await fileService.list([data.username])
+        ctx.body = {
+            code:'0',
+            data:file
+        }
+    }
+    // 获取当前最大用户文件id
+    async getFileID(ctx){
+        const res = await fileService.getFileID()
+        ctx.body = {
+            code:'0',
+            data:res[0].id
         }
     }
 }
