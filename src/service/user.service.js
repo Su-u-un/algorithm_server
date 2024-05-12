@@ -14,12 +14,12 @@ class UserService{
         return result
     }
     async login(value){
-        const _sql = `SELECT password FROM user WHERE username = ?;`
+        const _sql = `SELECT password,id FROM user WHERE username = ?;`
         const [result] = await db.query(_sql,value)
         return result
     }
     async list(value){
-        const _sql = `SELECT id,algo_type FROM algo WHERE create_by = ?;`
+        const _sql = `SELECT id,algo_type FROM algo WHERE create_by = ? AND del_tag != 0;`
         const [result] = await db.execute(_sql,value)
         return result
     }

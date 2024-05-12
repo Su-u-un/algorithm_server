@@ -38,30 +38,30 @@ class UserController{
             msg:"success",
             data:value
         }
-        // await axios({
-        //     url:'https://dfsns.market.alicloudapi.com/data/send_sms',
-        //     method: 'post',
-        //     headers:{
-        //         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        //         "Authorization":"APPCODE 56af8f0761c043c3af247b78b1be533b"
-        //     },
-        //     data:{
-        //         'content' : 'code:'+value,
-        //         'template_id' : 'CST_ptdie100',
-        //         'phone_number' : phone
-        //     }
-        // }).then(res => {
-        //     ctx.session[phone] = value
-        //     ctx.body = {
-        //         code:'0',
-        //         msg:"success"
-        //     }
-        // }).catch(err=>{
-        //     ctx.body = {
-        //         code:'0',
-        //         msg:err
-        //     }
-        // })
+        await axios({
+            url:'https://dfsns.market.alicloudapi.com/data/send_sms',
+            method: 'post',
+            headers:{
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "Authorization":"APPCODE 56af8f0761c043c3af247b78b1be533b"
+            },
+            data:{
+                'content' : 'code:'+value,
+                'template_id' : 'CST_ptdie100',
+                'phone_number' : phone
+            }
+        }).then(res => {
+            ctx.session[phone] = value
+            ctx.body = {
+                code:'0',
+                msg:"success"
+            }
+        }).catch(err=>{
+            ctx.body = {
+                code:'0',
+                msg:err
+            }
+        })
     }
     //登录
     async login(ctx){
@@ -74,9 +74,9 @@ class UserController{
             const users = await userService.exist(["",data.phone])
             // 生成token(用户信息,有效时间0.5天)
             const token = JWT.generate({
-                _id: users[0]._id,
+                _id: users[0].id,
                 username: users[0].username
-            }, "0.5d")
+            }, "7d")
             // 获取用户文件
             const temp = await userService.list([users[0].username])
             // 获取系统文件
@@ -88,17 +88,10 @@ class UserController{
                     id: id++,
                     algo_type: file
                 }
-                // let folders = fs.readdirSync(`${absolute}/${file}`)
-                // folders.forEach((folder) => {
-                //     let obj = {}
-                //     obj.id = id++
-                //     obj.folder_name = folder
-                //     obj.algo_type = file
-                //     arr.push(obj)
-                // })
             })
             // 请求头返回token
             // ctx.append('Authorization',token)
+            ctx.append("Authorization",token)
             ctx.body = {
                 code:'0',
                 msg:"success",
@@ -116,9 +109,9 @@ class UserController{
             if(cipher === data.password){
                 // 生成token(用户信息,有效时间0.5天)
                 const token = JWT.generate({
-                    _id: result[0]._id,
-                    username: result[0].username
-                }, "0.5d")
+                    _id: result[0].id,
+                    username: data.username
+                }, "7d")
                 // 获取用户文件
                 const temp = await userService.list([data.username])
                 // 获取系统文件
@@ -130,17 +123,10 @@ class UserController{
                         id: id++,
                         algo_type: file
                     }
-                    // let folders = fs.readdirSync(`${absolute}/${file}`)
-                    // folders.forEach((folder) => {
-                    //     let obj = {}
-                    //     obj.id = id++
-                    //     obj.folder_name = folder
-                    //     obj.algo_type = file
-                    //     arr.push(obj)
-                    // })
                 })
                 // 请求头返回token
                 // ctx.append('Authorization',token)
+                ctx.append("Authorization",token)
                 ctx.body = {
                     code:'0',
                     msg:"success",
@@ -172,30 +158,30 @@ class UserController{
             msg:"success",
             data:value
         }
-        // await axios({
-        //     url:'https://dfsns.market.alicloudapi.com/data/send_sms',
-        //     method: 'post',
-        //     headers:{
-        //         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        //         "Authorization":"APPCODE 56af8f0761c043c3af247b78b1be533b"
-        //     },
-        //     data:{
-        //         'content' : 'code:'+value,
-        //         'template_id' : 'CST_ptdie100',
-        //         'phone_number' : phone
-        //     }
-        // }).then(res => {
-        //     ctx.session[phone] = value
-        //     ctx.body = {
-        //         code:'0',
-        //         msg:"success"
-        //     }
-        // }).catch(err=>{
-        //     ctx.body = {
-        //         code:'-1',
-        //         msg:err
-        //     }
-        // })
+        await axios({
+            url:'https://dfsns.market.alicloudapi.com/data/send_sms',
+            method: 'post',
+            headers:{
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "Authorization":"APPCODE 56af8f0761c043c3af247b78b1be533b"
+            },
+            data:{
+                'content' : 'code:'+value,
+                'template_id' : 'CST_ptdie100',
+                'phone_number' : phone
+            }
+        }).then(res => {
+            ctx.session[phone] = value
+            ctx.body = {
+                code:'0',
+                msg:"success"
+            }
+        }).catch(err=>{
+            ctx.body = {
+                code:'-1',
+                msg:err
+            }
+        })
     }
     async imgCaptcha(ctx){
         // 随机验证码

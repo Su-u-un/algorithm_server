@@ -1,0 +1,88 @@
+// 导入API {
+  const { Tracer, Array2DTracer, LogTracer, Layout, VerticalLayout } = require('algorithm-visualizer');
+// }
+
+const n = 4; // 设置棋盘大小
+// 生成棋盘模型
+const board = (function createArray(n) {
+  const result = [];
+  for (let i = 0; i < n; i++) {
+    result[i] = Array(...Array(n)).map(Number.prototype.valueOf, 0);
+  }
+  return result;
+}(n));
+
+// 定义渲染器 {
+  const boardTracer = new Array2DTracer('Board');
+  const logger = new LogTracer('Progress');
+  Layout.setRoot(new VerticalLayout([boardTracer, logger]));
+  
+  boardTracer.set(board);
+  logger.println(`N Queens: ${n}X${n}matrix, ${n} queens`);
+  Tracer.delay();
+// }
+
+// ans用数组模拟可视化皇后位置
+const ans = [];
+// col记录皇后位置，下标为row，值为col
+const col = new Array(n).fill(0);
+// 记录列条件
+const onPath = new Array(n).fill(false);
+// 记录斜边条件
+const diag1 = new Array(n * 2 - 1).fill(false);
+const diag2 = new Array(n * 2 - 1).fill(false);
+
+function dfs(r) {
+// 打印当前操作 {
+  logger.println(`进入下一行遍历，当前是第${r}行`);
+  logger.println('------------------------------------------------------------------');
+// }
+    if (r === n) {
+        ans.push(col.map(c => ' . '.repeat(c) + ' Q ' + ' . '.repeat(n - 1 - c)));
+        // 打印当前操作 {
+          logger.println('所有皇后均已成功放置，继续进行迭代');
+        // }
+        return;
+    }
+    for (let c = 0; c < n; c++) {
+      // 可视化操作（进入尝试放置） {
+            logger.println(`尝试把当前皇后放在${r}行${c}列`);
+            boardTracer.select(r, c);
+            Tracer.delay();
+          // }
+      // 如果条件都满足
+        if (!onPath[c] && !diag1[r + c] && !diag2[r - c]) {
+            col[r] = c;
+            onPath[c] = diag1[r + c] = diag2[r - c] = true;
+            dfs(r + 1);
+          // 可视化操作（如果条件不满足被退回来了） {
+          logger.println(`${r}行${c}列放置失败，回溯`);
+            boardTracer.deselect(r, c);
+            Tracer.delay();
+            
+          // }
+            onPath[c] = diag1[r + c] = diag2[r - c] = false; // 恢复现场
+        }else{
+          // 可视化操作（如果条件不满足被退回来了） {
+          logger.println(`${r}行${c}列放置失败，继续遍历`);
+            boardTracer.deselect(r, c);
+            Tracer.delay();
+            
+          // }
+        }
+    }
+}
+
+// logger {
+logger.println('开始执行');
+// }
+dfs(0);
+// logger {
+logger.println('完成，最终皇后如下所示');
+for(let i = 0;i<ans.length;i++){
+  logger.println(`------第${i+1}种放置方法------`);
+  for(let j = 0;j<ans[i].length;j++){
+    logger.println(ans[i][j]);
+  }
+}
+// }

@@ -10,6 +10,10 @@ const sandbox = (code)=>{
 
 const lines = workerData.code.split('\n').map((line, i) => line.replace(/(\.\s*delay\s*)\(\s*\)/g, `$1(${i})`));
 const code = lines.join('\n');
-sandbox(code)
-// JSON.stringify
-parentPort.postMessage(algorithm.Commander.commands)
+try{
+    sandbox(code)
+}catch{
+    parentPort.postMessage('err')
+}
+if(algorithm.Commander.commands.length) parentPort.postMessage(algorithm.Commander.commands)
+else parentPort.postMessage(code)

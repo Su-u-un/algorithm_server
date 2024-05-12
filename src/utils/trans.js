@@ -620,14 +620,6 @@ var GraphTracer = /** @class */ (function (_super) {
     return GraphTracer;
 }(Tracer));
 
-var ScatterTracer = /** @class */ (function (_super) {
-    __extends(ScatterTracer, _super);
-    function ScatterTracer() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    return ScatterTracer;
-}(Array2DTracer));
-
 exports.Array1DTracer = Array1DTracer;
 exports.Array2DTracer = Array2DTracer;
 exports.ChartTracer = ChartTracer;
@@ -637,6 +629,5 @@ exports.HorizontalLayout = HorizontalLayout;
 exports.Layout = Layout;
 exports.LogTracer = LogTracer;
 exports.Randomize = Randomize$1;
-exports.ScatterTracer = ScatterTracer;
 exports.Tracer = Tracer;
 exports.VerticalLayout = VerticalLayout;

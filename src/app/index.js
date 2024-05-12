@@ -2,7 +2,9 @@ const Koa = require('koa')
 const bodyparser = require('koa-bodyparser')
 const session = require('koa-session')
 const cors = require('@koa/cors')
+const koajwt = require('koa-jwt')
 
+const JWT = require('../utils/jwt')
 const registerRouters = require('../router')
 const app = new Koa()
 
@@ -11,7 +13,7 @@ const SESSION = {
     /** （数字 || 'session'）maxAge，毫秒数（默认为 1 天） */
     /** 'session'将导致 cookie 在会话/浏览器关闭时过期 */
     /** 如果会话 cookie 被盗，该 cookie 将永远不会过期 */
-    maxAge: 10000*60*5,// 5min
+    maxAge: 10000 * 60 * 5,// 5min
     // autoCommit: true, /** (boolean) 自动提交标头 (默认 true) */
     // overwrite: true, /** /** (boolean) 是否可以覆盖(默认 true) */
     // httpOnly: true, /** (boolean) httpOnly 或 not (默认 true) */
@@ -29,13 +31,54 @@ app.use(cors({
 }))
 app.use(session(SESSION, app));
 // 加盐
-app.keys = ['s','u','n']
+app.keys = ['s', 'u', 'n']
 
 app.use(bodyparser({
     jsonLimit: '10mb',
     formLimit: '10mb',
     textLimit: '10mb'
 }))
+
+// 验证token中间件(在注册路由前)
+app.use(async (ctx, next) => {
+    // 如果token有效 ,next() 
+    // 如果token过期了, 返回401错误
+    const url = ctx.url
+    const index = url.indexOf("/", 1);
+    if (url.substring(0, index) === "/user") {
+        await next()
+        return
+    }
+    const token = ctx.header["authorization"]
+    //token解析
+    if (token) {
+        var payload = JWT.verify(token.slice(1, -1))
+        if (payload) {
+            // 每一次请求,重新生成新的token
+            const newToken = JWT.generate({
+                _id: payload._id,
+                username: payload.username
+            }, "7d")
+            ctx.append("Authorization", newToken)
+            await next()
+        }else {
+            ctx.status = 401
+            ctx.body = {
+                code: "-1",
+                error: "登录信息过期，请重新登录"
+            }
+        }
+    } else {
+        ctx.status = 403
+        ctx.body = {
+            code: "-1",
+            error: "token无效，请重新登录"
+        }
+    }
+        
+    
+})
+
 registerRouters(app)
 
 module.exports = app

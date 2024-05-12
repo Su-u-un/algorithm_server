@@ -28,6 +28,7 @@ class fileController {
             fs.writeFileSync(resolve(fileURL,tempurl), content);
             ctx.body = {
                 code:'0',
+                data:tempurl,
                 msg:'保存成功'
             }
         }
@@ -44,14 +45,12 @@ class fileController {
     }
     // 删除file
     async delete(ctx){
-        const data = ctx.request.query
-        // const url = 
-        // if(await fileService.delete([data.filename,data.id,data.username])){
-        //     fs.unlinkSync(resolve(fileURL,data.username,data.filename));
-        // }
+        const {realurl} = ctx.request.query
+        // 数据库内删除
+        await fileService.delete([realurl])
         ctx.body = {
             code:'0',
-            msg:'删除还没写'
+            msg:'删除成功'
         }
     }
     // 读取file
@@ -60,12 +59,12 @@ class fileController {
         // 得到所有文件的url
         const res = await fileService.readFile([id])
         // 为空说明是新建的文件夹，没有file，这边直接新建一个，并且写进数据库
-        if(!res.length){
-            // 定义一个独一无二的url，用它作真实路径
-            const tempurl = `${new Date().getTime()}.txt`
-            await fileService.add(['readme.md',id,tempurl,'md'])
-            fs.writeFileSync(resolve(fileURL,tempurl), '');
-        }
+        // if(!res.length){
+        //     // 定义一个独一无二的url，用它作真实路径
+        //     const tempurl = `${new Date().getTime()}.txt`
+        //     await fileService.add(['readme.md',id,tempurl,'md'])
+        //     fs.writeFileSync(resolve(fileURL,tempurl), '');
+        // }
         const files = []
         for(let i=0;i<res.length;i++){
             const temp = fs.readFileSync(resolve(fileURL,res[i].real_url)).toString()
@@ -109,6 +108,16 @@ class fileController {
             data:res
         }
     }
+    // 删除folder
+    async deleteFolder(ctx){
+        const {id} = ctx.request.query
+        await fileService.deleteFolderByID([id,id])
+        ctx.body = {
+            code:'0',
+            msg:'删除成功'
+        }
+    }
+
     // build代码
     async build(ctx){
         let {url,content} = ctx.request.body
@@ -191,6 +200,23 @@ class fileController {
         }
         
     }
+    // 删除Algo
+    async deleteAlgo(ctx){
+        const {id} = ctx.request.query
+        await fileService.deleteAlgo([id])
+        // 得到folder_id
+        const res = await fileService.deleteFolderByAlgoID([id,id])
+        // 如果有文件
+        if(res[0].length){
+            for(let i=0;i<res[0].length;i++){
+                await fileService.deleteByFolderID([res[0][i].id])
+            }
+        }
+        ctx.body = {
+            code:'0',
+            msg:'删除成功'
+        }
+    }
     // 获取用户文件和公共文件
     async list(ctx){
         const data = ctx.request.query
@@ -202,8 +228,8 @@ class fileController {
         }
     }
     // 获取当前最大用户文件id
-    async getFileID(ctx){
-        const res = await fileService.getFileID()
+    async getFolderID(ctx){
+        const res = await fileService.getFolderID()
         ctx.body = {
             code:'0',
             data:res[0].id
