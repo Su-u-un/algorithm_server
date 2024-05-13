@@ -2,7 +2,6 @@ const Koa = require('koa')
 const bodyparser = require('koa-bodyparser')
 const session = require('koa-session')
 const cors = require('@koa/cors')
-const koajwt = require('koa-jwt')
 
 const JWT = require('../utils/jwt')
 const registerRouters = require('../router')
