@@ -38,30 +38,30 @@ class UserController{
             msg:"success",
             data:value
         }
-        await axios({
-            url:'https://dfsns.market.alicloudapi.com/data/send_sms',
-            method: 'post',
-            headers:{
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Authorization":"APPCODE 56af8f0761c043c3af247b78b1be533b"
-            },
-            data:{
-                'content' : 'code:'+value,
-                'template_id' : 'CST_ptdie100',
-                'phone_number' : phone
-            }
-        }).then(res => {
-            ctx.session[phone] = value
-            ctx.body = {
-                code:'0',
-                msg:"success"
-            }
-        }).catch(err=>{
-            ctx.body = {
-                code:'0',
-                msg:err
-            }
-        })
+        // await axios({
+        //     url:'https://dfsns.market.alicloudapi.com/data/send_sms',
+        //     method: 'post',
+        //     headers:{
+        //         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        //         "Authorization":"APPCODE dd7acf2874a744d6acbcf87d554a2a65"
+        //     },
+        //     data:{
+        //         'content' : 'code:'+value,
+        //         'template_id' : 'CST_ptdie100',
+        //         'phone_number' : phone
+        //     }
+        // }).then(res => {
+        //     ctx.session[phone] = value
+        //     ctx.body = {
+        //         code:'0',
+        //         msg:"success"
+        //     }
+        // }).catch(err=>{
+        //     ctx.body = {
+        //         code:'0',
+        //         msg:err
+        //     }
+        // })
     }
     //登录
     async login(ctx){
@@ -158,30 +158,30 @@ class UserController{
             msg:"success",
             data:value
         }
-        await axios({
-            url:'https://dfsns.market.alicloudapi.com/data/send_sms',
-            method: 'post',
-            headers:{
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                "Authorization":"APPCODE 56af8f0761c043c3af247b78b1be533b"
-            },
-            data:{
-                'content' : 'code:'+value,
-                'template_id' : 'CST_ptdie100',
-                'phone_number' : phone
-            }
-        }).then(res => {
-            ctx.session[phone] = value
-            ctx.body = {
-                code:'0',
-                msg:"success"
-            }
-        }).catch(err=>{
-            ctx.body = {
-                code:'-1',
-                msg:err
-            }
-        })
+        // await axios({
+        //     url:'https://dfsns.market.alicloudapi.com/data/send_sms',
+        //     method: 'post',
+        //     headers:{
+        //         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        //         "Authorization":"APPCODE dd7acf2874a744d6acbcf87d554a2a65"
+        //     },
+        //     data:{
+        //         'content' : 'code:'+value,
+        //         'template_id' : 'CST_ptdie100',
+        //         'phone_number' : phone
+        //     }
+        // }).then(res => {
+        //     ctx.session[phone] = value
+        //     ctx.body = {
+        //         code:'0',
+        //         msg:"success"
+        //     }
+        // }).catch(err=>{
+        //     ctx.body = {
+        //         code:'-1',
+        //         msg:err
+        //     }
+        // })
     }
     async imgCaptcha(ctx){
         // 随机验证码
