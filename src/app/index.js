@@ -23,7 +23,7 @@ const SESSION = {
     // sameSite: null, /** (字符串) 会话 cookie SameSite 选项 (默认为 null，不要设置) */
 };
 app.use(cors({
-    origin: 'http://localhost:3001',
+    origin: '*',
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
     credentials: true
