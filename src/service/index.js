@@ -1,11 +1,11 @@
 const mysql = require('mysql2')
 
-// 本地使用http://localhost
+// 本地使用localhost
 // 这里有个数据库bug需要修复，尝试复现
 const pool = mysql.createPool({
     host: '47.242.73.45',
     user: 'root',
-    password: 'root',
+    password: '123456',
     database: 'algovis',
     multipleStatements: true
 })
@@ -14,12 +14,13 @@ const pool = mysql.createPool({
 exports.query = (sql,values) => {
     return new Promise((resolve,reject)=>{
         pool.getConnection((err, connection) => {
-            if(err) reject(err)
+            if(err) {console.log('1');reject(err)}
             else{
-                connection.query(sql, values, (err, rows) => {
-                    if(err) {
-                        console.log('err',err);
-                        reject(err)
+                connection.query(sql, values, (error, rows) => {
+                    if(error) {
+                        console.log('2')
+                        reject(error)
+                        throw error
                     }
                     else {
                         resolve(rows)
@@ -34,12 +35,13 @@ exports.query = (sql,values) => {
 exports.execute = (sql,values) => {
     return new Promise((resolve,reject)=>{
         pool.getConnection((err, connection) => {
-            if(err) reject(err)
+            if(err) {console.log('1');reject(err)}
             else{
-                connection.execute(sql, values, (err, rows) => {
-                    if(err) {
-                        console.log('err',err);
-                        reject(err)
+                connection.execute(sql, values, (error, rows) => {
+                    if(error) {
+                        console.log('2')
+                        reject(error)
+                        throw(error)
                     }
                     else {
                         resolve(rows)
@@ -51,7 +53,3 @@ exports.execute = (sql,values) => {
         })
     })
 }
-
-// const connection = pool.promise()
-
-// module.exports = connection
